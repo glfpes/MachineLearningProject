@@ -1,0 +1,7 @@
+optimization finished, #iter = 7274
+nu = 0.113121
+obj = -10038.031016, rho = -0.458204
+nSV = 10219, nBSV = 10148
+Total nSV = 10219
+时间已过 545.457509 秒。
+Accuracy = 95.43% (9543/10000) (classification)

@@ -1,0 +1,7 @@
+optimization finished, #iter = 1
+nu = 1.#QNAN0
+obj = 1.#QNAN0, rho = 1.#QNAN0
+nSV = 0, nBSV = 0
+Total nSV = 0
+时间已过 0.031109 秒。
+Accuracy = 51.21% (5121/10000) (classification)

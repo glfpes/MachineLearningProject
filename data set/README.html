@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Learning in DOTA2 -- Hero Composition Counts</title>
+<link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><h1 id="machine-learning-in-dota2-hero-composition-counts">Machine Learning in DOTA2 – Hero Composition Counts</h1>
+
+<p>plz contact yumaoshu at gmail.com</p>
+
+<p>version-2015-4-12</p>
+
+
+
+<h2 id="background">Background</h2>
+
+<p><em>Each match of Dota 2 is independent and involves two teams, the Radiant and the Dire, both containing five players and each occupying a stronghold at either end of the map. Located in each stronghold is a building called the “Ancient”; to win, a team must destroy the enemy’s Ancient. Each player controls a “Hero” character and focuses on leveling up, collecting gold, acquiring items and fighting against the other team to achieve victory.</em> – wikipedia</p>
+
+<p><em>There are nine game modes and around 100 “Heroes” in Dota 2. Heroes are strategically powerful player-controlled units with unique special abilities; though many heroes fill similar roles as others, each confers different benefits and limitations to a team. These Heroes start off very weak early in the game, but level up their abilities and statistics as they accumulate experience, up to a maximum level of twenty-five. The Heroes’ methods of combat are heavily influenced by their primary property, which can be Strength, Agility, or Intelligence. Most game modes provide teams with some preparation time before the game begins so that they can balance their hero selections, as the composition of the team can significantly affect their performance throughout the match. Because Dota 2 is highly team-oriented, the players must coordinate and plan with each other in order to achieve victory.</em> – wikipedia</p>
+
+
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Since heroes are unique, there might be some hidden soft counter or beneficial relationships between heroes. i.e. Phantom Lancer and Keeper of the Light is a good pair while Bounty Hunter is a good choice for hunting Riki.</p>
+
+<p>However, human intuition is weak telling whether a whole team has the advantage against another.</p>
+
+<p>DOTA2 opened its matches history to public. Can you excavate something useful from them?</p>
+
+
+
+<h2 id="goal">Goal</h2>
+
+<p>Given a subset of recent match history. You are to learn how hero selection is affecting the match with the help of your computer.</p>
+
+
+
+<h2 id="details">Details</h2>
+
+<p>In each match, <strong>10 heroes picked</strong> is the <strong>input</strong> of this question. While <strong>The match result</strong> is the <strong>output</strong>.</p>
+
+<p>Except the hero composition and the match result, some extra info is also given to help. You can treat the extras as adjustment of the bare result. i.e.: Radiant got 100 kills while Dire 10 kills and won the match. You can treat the match as a wonder and tell your model the Dire suffered a lot but won, this can’ t happen a second time. But they are <strong>not available while testing</strong>. Find some way to use them.</p>
+
+<p>There are many factors that may affect the result, such as the hero familiarity of its controller, the skill of this match, the mistake or accident during the match. However, the naive baseline model got 61%(mid-size) of accuracy. Which proves that this problem is valuable.</p>
+
+
+
+<h2 id="problem-folder-structure">Problem Folder Structure</h2>
+
+<ul>
+<li><p>tool programs</p>
+
+<ul><li>sample.py - provide some naive extracting / training / predicting method</li>
+<li>tools.py - for dataset evaluating (and splitting but not for you)</li>
+<li>guide10K.sh / guide100K.sh - shows the working flow of baseline program, you can just run them to see what will happen</li>
+<li>guide1M_run_this_unless_you_have_more_than_32GB_memory_plz_write_your_own_extractor.sh - naive extractor will use up to 32GB memory. After that, json module will raise an Exception that it can’ t handle such data. So this is not actually a guide but a joke. You need to write your own json parser and to deal with that giant under 1M/ folder. (Hint: just read, extract, and then forget instead of read the whole json into memory)</li></ul></li>
+<li><p>data</p>
+
+<ul><li>10K/dota2_10K.txt - tiny data for training</li>
+<li>100K/dota2_100K.txt - mid-size data for training</li>
+<li>1M/dota2_1M.txt - huge-size data for training</li>
+<li>test/dota2_100K_test_input.txt - data for testing</li>
+<li>test/dota2_100K_test_label.txt - label of testing data</li></ul></li>
+<li><p>readme</p>
+
+<ul><li>README.md</li>
+<li>README.html</li></ul></li>
+</ul>
+
+
+
+<h2 id="baseline">Baseline</h2>
+
+<p>The baseline only extracted 10 heroes picked and the match result for training. However it can be regarded a shortway for you to quickly get familiar with data.</p>
+
+<p>NumPy is used in baseline program to do linear regression and got 59%(tiny)/61%(mid-size) of accuracy.</p>
+
+
+
+<h2 id="data">Data</h2>
+
+<p>There are three data set available, with the size of 10K matches(packed), 100K matches(packed) and 1M matches(packed in current version). <br>
+Due to that the smaller data set is a subset of the larger one. Please <strong>do not</strong> use the smaller training data set as dev set while training the model with the larger one. Use CV instead to evaluate. A test set of 100K matches should never get involved until testing starts.</p>
+
+<p>All matches were played by 10 human players in All Pick mode. Abandoned games are filtered out.</p>
+
+<p>Data file is formed as a json list, aka many [] wrapped JSON Objects. <br>
+Each Object contains the following keys:</p>
+
+<ul>
+<li>match_id - the numeric match ID</li>
+<li>radiant_win - true if radiant won, false otherwise</li>
+<li>duration - the total time in seconds the match ran for</li>
+<li><p>tower_status_dire - an 11-bit unsinged int:</p>
+
+<pre><code>┌─┬─┬─┬─┬─────────────────────── Not used.
+│ │ │ │ │ ┌───────────────────── Ancient Top
+│ │ │ │ │ │ ┌─────────────────── Ancient Bottom
+│ │ │ │ │ │ │ ┌───────────────── Bottom Tier 3
+│ │ │ │ │ │ │ │ ┌─────────────── Bottom Tier 2
+│ │ │ │ │ │ │ │ │ ┌───────────── Bottom Tier 1
+│ │ │ │ │ │ │ │ │ │ ┌─────────── Middle Tier 3
+│ │ │ │ │ │ │ │ │ │ │ ┌───────── Middle Tier 2
+│ │ │ │ │ │ │ │ │ │ │ │ ┌─────── Middle Tier 1
+│ │ │ │ │ │ │ │ │ │ │ │ │ ┌───── Top Tier 3
+│ │ │ │ │ │ │ │ │ │ │ │ │ │ ┌─── Top Tier 2
+│ │ │ │ │ │ │ │ │ │ │ │ │ │ │ ┌─ Top Tier 1
+│ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+</code></pre></li>
+<li><p>tower_status_radiant - an 11-bit unsinged int</p></li>
+<li><p>barracks_status_dire - a 6-bit unsinged int:</p>
+
+<pre><code>┌─┬───────────── Not used.
+│ │ ┌─────────── Bottom Ranged
+│ │ │ ┌───────── Bottom Melee
+│ │ │ │ ┌─────── Middle Ranged
+│ │ │ │ │ ┌───── Middle Melee
+│ │ │ │ │ │ ┌─── Top Ranged
+│ │ │ │ │ │ │ ┌─ Top Melee
+│ │ │ │ │ │ │ │
+0 0 0 0 0 0 0 0
+</code></pre></li>
+<li><p>barracks_status_radiant - a 6-bit unsinged int</p></li>
+<li><p>players - a JSON list including the following keys:</p>
+
+<ul><li><p>player_slot - an 8-bit unsigned int: if the left-most bit is set, the player was on dire. the two right-most bits represent the player slot (0-4)</p>
+
+<pre><code>┌─────────────── Team (false if Radiant, true if Dire).
+│ ┌─┬─┬─┬─────── Not used.
+│ │ │ │ │ ┌─┬─┬─ The position of a player within their team (0-4).
+│ │ │ │ │ │ │ │
+0 0 0 0 0 0 0 0
+</code></pre></li>
+<li><p>hero_id - the numeric ID of the hero that the player used</p></li>
+<li>kills - the number of kills the player got</li>
+<li>deaths - the number of times the player died</li>
+<li>gold_per_min - the player’s total gold/min</li>
+<li>xp_per_min - the player’s total xp/min</li>
+<li>level - the player’s final level</li>
+<li>last_hits - the number of times a player last-hit a creep</li>
+<li>denies - the number of times a player denied a creep</li>
+<li>hero_damage - the amount of damage the player dealt to heroes</li>
+<li>tower_damage - the amount of damage the player dealt to towers</li></ul></li>
+</ul></div></body>
+</html>
