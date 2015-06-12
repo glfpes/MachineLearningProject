@@ -1,9 +1,12 @@
 \BOOKMARK [1][-]{section.1}{Background and Motivation}{}% 1
 \BOOKMARK [1][-]{section.2}{Retrieve Data}{}% 2
-\BOOKMARK [1][-]{section.3}{SVM}{}% 3
-\BOOKMARK [1][-]{section.4}{Exploiting CNN to make a prediction on whether should we give up}{}% 4
-\BOOKMARK [2][-]{subsection.4.1}{Convolutional Neural Networks}{section.4}% 5
-\BOOKMARK [2][-]{subsection.4.2}{Network Design}{section.4}% 6
-\BOOKMARK [2][-]{subsection.4.3}{Train the Network}{section.4}% 7
-\BOOKMARK [2][-]{subsection.4.4}{Prediction Evaluation}{section.4}% 8
-\BOOKMARK [1][-]{section.5}{Evaluation and Conclusion}{}% 9
+\BOOKMARK [1][-]{section.3}{Exploit SVMs to verify the decisive factors}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Necessity to verify individually}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Apply SVMs efficiently}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Reveal the truly most decisive factors}{section.3}% 6
+\BOOKMARK [1][-]{section.4}{Exploiting CNN to make a prediction on whether should we give up}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Convolutional Neural Networks}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Network Design}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.3}{Train the Network}{section.4}% 10
+\BOOKMARK [2][-]{subsection.4.4}{Prediction Evaluation}{section.4}% 11
+\BOOKMARK [1][-]{section.5}{Evaluation and Conclusion}{}% 12
