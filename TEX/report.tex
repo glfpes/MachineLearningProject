@@ -67,7 +67,7 @@
 %	TITLE
 %----------------------------------------------------------------------------------------
 
-\title{\textbf{A Predictor of Dota2}\\ % Title
+\title{\textbf{A Predictor of DOTA2}\\ % Title
 Machine Learning Project Report} % Subtitle
 
 \author{\textsc{Wang Xiaohui, Yang Guang, Yang Yi, Zhuo Yiwei} % Author
@@ -88,10 +88,10 @@ Machine Learning Project Report} % Subtitle
 %\renewcommand{\abstractname}{Summary} % Uncomment to change the name of the abstract to something else
 
 \begin{abstract}
-
+In this work, we collected the practical match data of DOTA2, and based on the data, we introduced two research on predicting the match result based on Support Vector Machine (SVM) and Convolutional Neural Networks (CNN). In order to find which parameter determines the result of the match, we exploit SVM to analyze all 11 parameters and find their weights in deciding the match result. And we find out several key parameters that players should focus on since these parameters have an outstanding influence on winning the game. In order to give an advice for players whether should they give up the ongoing game based on historical match data, we exploit CNN to make a prediction based on all 11 data items. We reached a 98.33\% prediction accuracy based on our trained CNN classifier model. 
 \end{abstract}
 
-\hspace*{3,6mm}\textit{Keywords:} SVM , CNN , Classifier, Logistic Regression % Keywords
+\hspace*{3,6mm}\textit{Keywords:} SVM , CNN , Predictor, DOTA2 % Keywords
 
 \vspace{30pt} % Some vertical space between the abstract and first section
 
@@ -99,14 +99,95 @@ Machine Learning Project Report} % Subtitle
 %	ESSAY BODY
 %----------------------------------------------------------------------------------------
 
-\section{Perblem Statement}
+\section{Background and Motivation}
+Each match of Dota 2 is independent and involves two teams, the Radiant and the Dire, both containing five players and each occupying a stronghold at either end of the map. Located in each stronghold is a building called the "Ancient"; to win, a team must destroy the enemy's Ancient. Each player controls a "Hero" character and focuses on leveling up, collecting gold, acquiring items and fighting against the other team to achieve victory.
+
+There are nine game modes and around 100 "Heroes" in Dota 2. Heroes are strategically powerful player-controlled units with unique special abilities; though many heroes fill similar roles as others, each confers different benefits and limitations to a team. These Heroes start off very weak early in the game, but level up their abilities and statistics as they accumulate experience, up to a maximum level of twenty-five. The Heroes' methods of combat are heavily influenced by their primary property, which can be Strength, Agility, or Intelligence. Most game modes provide teams with some preparation time before the game begins so that they can balance their hero selections, as the composition of the team can significantly affect their performance throughout the match. Because Dota 2 is highly team-oriented, the players must coordinate and plan with each other in order to achieve victory.\cite{dota2}
+
+We start our work in order to give reliable advice for players to concentrate on certain indexes. Also, for many circumstances, although continuing the game and struggling for victory would be an active attitude, however we find that for most cases these strives rest in vain and this process would make great harm to players' sentiment. So we researched on the actual match data and wanted to derive a high-performance predictor to make a reliable recommendation for players on whether they should give up the remaining game.
+
+\section{Retrieve Data}
+We collected 100K randomly chosen pieces of actual match data for our research, and choose 90K data as our training set and 10K as the testing set. Each piece of dataset is a log of one match, and listed ten players who attends the match with 11 items for each player describing certain match parameter listed in Table 1.
+\begin{table}[htbp]	
+	\centering 
+	\begin{tabular}{lcl}
+		\toprule
+		denies & the number of times a player denied a creep\\
+		xp\_per\_min &  the player's total xp/min\\
+		player\_slot & 8-bit, top bit true is team dire and last 2 bits means player slot\\
+		kills & the number of kills the player got\\
+		level & the player's final level\\
+		deaths & the number of times the player died\\
+		hero\_damage &  the amount of damage the player dealt to heroes\\
+		last\_hits & the number of times a player last-hit a creep\\
+		hero\_id & the numeric ID of the hero that the player used\\
+		tower\_damage & the amount of damage the player dealt to towers\\
+		gold\_per\_min & the player's total gold/min\\
+		
+		\bottomrule
+	\end{tabular}
+	\caption{\label{tab:test}11 Data items for each player in the dataset}
+\end{table}
+
+Figure 1 shows an sample of dataset from one match. We consider only the ten players' data items. All 100K matches are stored in plain text. We build a 3-Dimensional matrix of $10 \times 11 \times 100000$, storing all data items in the sequence of Table 1 above as our input. And we build a vector of 100000 elements tagged the labels of the inputs in the same sequence.
+\begin{figure}[h]
+	\centering 
+	\includegraphics[width=1.0\linewidth]{Figure1.png}
+	\caption{An example of one data sample of a match}
+	\label{fig:subfig}
+\end{figure}
 
 \section{SVM}
 
-\section{CNN}
+\section{Exploiting CNN to make a prediction on whether should we give up}
+\subsection{Convolutional Neural Networks}
+Convolutional Neural Networks is a type of feed-forward artificial neural network where the individual neurons are tiled in such a way that they respond to overlapping regions in the visual field.\cite{CNN1} A CNN is comprised of one or more convolutional layers (often with a subsampling step) and then followed by one or more fully connected layers as in a standard multilayer neural network.\cite{CNN2} For each layer of the network, 
+The benefits of CNN is that it can dramatically reduce the amount of parameters that should be trained. As the figure shows below, if we obtain $1000 \times 1000$ pixels, with 1M hidden neurons, and for each neuron it should connect each pixel of the image, then there exists $10^{12}$ connections, which needs to train $10^{12}$ parameters. However, the spatial connection of the image is localized, so one neuron doesn't have to comprehend the total details of the image, and only need to read the local part of the image. And in upper layer we can synthesis different parts so that we get the global information. By this we can dramatically reduce the amount of connections. Suppose one nueron need only to connect with $10 \times 10$ pixels, the total amount of connection is $10^8$.
+\begin{figure}[h]
+	\centering 
+	\includegraphics[width=0.8\linewidth]{Figure2.jpg}
+	\caption{CNN Reduces Parameters}
+	\label{fig:subfig}
+\end{figure}
+
+In fact, we can apply same parameters for every neuron, so the parameters we need to train draws down to $10 \times 10$.
+
+\subsection{Network Design}
+
+
+\subsection{Train the Network}
+Before we set the structured data discussed in section 2, we need to initialize the data by using each match data items subtract the average value of all matches.
+
+We need to train a classifier with an output label with "insist on" or "give up". The training set consists of m labeled samples \{${(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}), \dots,(x^{(m)},y^{(m)})}$\}, and the input feature vector $x^{(i)} \in \mathbb{R^{N+1}}$ with $x_0 = 1$ corresponding to the interception item and $\mathbb{N}$ here refer to 11. We exploit softmax regression for this binary-classifier. Because label $y^{(i)} \in \{0,1\}$, so in this condition Softmax degenerated into logistic regression. The hypothesis function listed as below:
+ \begin{equation*}
+ \centering
+ h_\theta(x) = \frac{1}{1+exp(-\theta^Tx)}
+ \end{equation*}
+We will train the parameter $\theta$ in order to minimize the cost function below, and we adopted gradient descent to minimize $J(\theta)$.
+ \begin{equation*}
+ \centering
+ J(\theta) = -\frac{1}{m}[\sum_{i=1}^{m}y^{(i)}logh_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]
+ \end{equation*}
+ 
+
+\subsection{Prediction Evaluation}
+We performed the experiment using Matlab, and reached an accuracy of 98.33\% prediction accuracy rate.
+Figure 3(a) shows the change of loss function $J(\theta)$ during the training process. Figure 3(b) shows the error prediction rate of the testing set. We perform the testing process once after the network updates its parameters by randomly choose 500 matches from the testing set.
+\begin{figure}[h]
+	\centering 
+	\subfigure[loss function]{ 
+		\label{fig:subfig:a} 
+		\includegraphics[width=0.4\linewidth]{cnn_lossfunction.jpg}} 
+	\subfigure[test error rate]{
+		\label{fig:subfig:b} 
+		\includegraphics[width=0.4\linewidth]{cnn_test_error_rate.jpg}}
+	\caption{The results of CNN}
+	\label{fig:subfig}
+\end{figure}
 
 \section{Evaluation and Conclusion}
-
+We draw the conclusion that one should focus on earning money and bring damage to towers of the foes so that they would be more possible to win a match. We exploits SVM to implement this feature.
+We also trained a reliable model that can provide reliable recommendation of whether you should give up or insist on based on the retrieved data of the ongoing match. We exploits CNN to implement this feature.
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -119,6 +200,17 @@ P.Bahl, V.N. Padmanabhan,
 ``Radar: An in-building RF-Based User Location and Tracking System.''
 \textit{Proc. of IEEE INFOCOM}, volumn 2, pp. 775-784, 2000.
 
+\bibitem[2]{dota2}
+``$www.en.wikipedia.org/wiki/Dota\_2$''
+\textit{WikiPedia}
+
+\bibitem[3]{CNN1}
+``$www.en.wikipedia.org/wiki/Convolutional\_neural\_network$''
+\textit{WikiPedia}
+
+\bibitem[4]{CNN2}
+``$www.ufldl.stanford.edu/tutorial/supervised/ConvolutionalNeuralNetwork/$''
+\textit{Stanford}
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------

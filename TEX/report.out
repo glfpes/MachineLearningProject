@@ -1,4 +1,9 @@
-\BOOKMARK [1][-]{section.1}{Perblem Statement}{}% 1
-\BOOKMARK [1][-]{section.2}{SVM}{}% 2
-\BOOKMARK [1][-]{section.3}{CNN}{}% 3
-\BOOKMARK [1][-]{section.4}{Evaluation and Conclusion}{}% 4
+\BOOKMARK [1][-]{section.1}{Background and Motivation}{}% 1
+\BOOKMARK [1][-]{section.2}{Retrieve Data}{}% 2
+\BOOKMARK [1][-]{section.3}{SVM}{}% 3
+\BOOKMARK [1][-]{section.4}{Exploiting CNN to make a prediction on whether should we give up}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Convolutional Neural Networks}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Network Design}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.3}{Train the Network}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.4}{Prediction Evaluation}{section.4}% 8
+\BOOKMARK [1][-]{section.5}{Evaluation and Conclusion}{}% 9
