@@ -88,7 +88,7 @@ Machine Learning Project Report} % Subtitle
 %\renewcommand{\abstractname}{Summary} % Uncomment to change the name of the abstract to something else
 
 \begin{abstract}
-In this work, we collected the practical match data of DOTA2, and based on the data, we introduced two research on predicting the match result based on Support Vector Machine (SVM) and Convolutional Neural Networks (CNN). In order to find which parameter determines the result of the match, we exploit SVM to analyze all 11 parameters and find their weights in deciding the match result. And we find out several key parameters that players should focus on since these parameters have an outstanding influence on winning the game. In order to give an advice for players whether should they give up the ongoing game based on historical match data, we exploit CNN to make a prediction based on all 11 data items. We reached a 98.33\% prediction accuracy based on our trained CNN classifier model. 
+In this work, we collected the practical match data of DOTA2, and based on the data, we introduced two research on predicting the match result based on Support Vector Machine (SVM) and Convolutional Neural Networks (CNN). In order to find which parameter determines the result of the match, we exploit SVM to analyze all 11 parameters and find their weights in deciding the match result. And we find out several key parameters that players should focus on since these parameters have an outstanding influence on winning the game. In order to give an advice for players whether should they give up the ongoing game based on historical match data, we exploit CNN to make a prediction based on all 11 data items. We reached a 98.33\% prediction accuracy based on our trained CNN classifier model.
 \end{abstract}
 
 \hspace*{3,6mm}\textit{Keywords:} SVM , CNN , Predictor, DOTA2 % Keywords
@@ -109,7 +109,7 @@ We start our work in order to give reliable advice for players to concentrate on
 \section{Retrieve Data}
 We collected 100K randomly chosen pieces of actual match data for our research, and choose 90K data as our training set and 10K as the testing set. Each piece of dataset is a log of one match, and listed ten players who attends the match with 11 items for each player describing certain match parameter listed in Table 1.
 \begin{table}[htbp]	
-	\centering 
+	\centering
 	\begin{tabular}{lcl}
 		\toprule
 		denies & the number of times a player denied a creep\\
@@ -131,7 +131,7 @@ We collected 100K randomly chosen pieces of actual match data for our research, 
 
 Figure 1 shows an sample of dataset from one match. We consider only the ten players' data items. All 100K matches are stored in plain text. We build a 3-Dimensional matrix of $10 \times 11 \times 100000$, storing all data items in the sequence of Table 1 above as our input. And we build a vector of 100000 elements tagged the labels of the inputs in the same sequence.
 \begin{figure}[h]
-	\centering 
+	\centering
 	\includegraphics[width=1.0\linewidth]{Figure1.png}
 	\caption{An example of one data sample of a match}
 	\label{fig:subfig}
@@ -140,14 +140,14 @@ Figure 1 shows an sample of dataset from one match. We consider only the ten pla
 \section{Exploit SVMs to verify the decisive factors}
 
 \subsection{Necessity to verify individually}
-We are all the youth who have played or have heard some video games. As to the issue of finding out a good enough prediction of Dota2, our experiences and intuitions naturally tell us: There are many factors that may affect the result differently, such as the hero familiarity of its controller, the skill of this match, the mistake or accident during the match. 
+We are all the youth who have played or have heard some video games. As to the issue of finding out a good enough prediction of Dota2, our experiences and intuitions naturally tell us: There are many factors that may affect the result differently, such as the hero familiarity of its controller, the skill of this match, the mistake or accident during the match.
 From the data set, actually we found there are 11 items for each player in a match, which are identified as $denies$, $xp\_per\_min$, $player\_slot$, $kills$, $level$, $deaths$, $hero\_damage$, $last\_hits$, $hero\_id$, $tower\_damage$ and $gold\_per\_min$ respectively. They are all the information we can make use of. We are asked by the proposer to use the items of "hero-id" and "level" only to predict the winner originally. But our group doubt whether or not the hero composition and the level of players truly are the most decisive factors. If the answer is negative, the accuracy of some machine learning method can be poor and meaningless. So one of our key points is that we need to figure out how much the single item associate with the accuracy of prediction result individually.
 
 
 \subsection{Apply SVMs efficiently}
 Our data set, with the size of 100,000 matches, can be regarded as a 10*11*10,000 three-dimensional matrix. It's a mid-size data! Fortunately, through the course of Machine Learning, we know: 1) SVMs, which are among the best (and many believe is indeed the best) "off-the-shelf" supervised learning algorithm; 2) Kernel trick, which give a way to apply SVMs efficiently in very high dimensional feature spaces. So we choose to use the algorithm of kernel trick which should be suitable to solve this problem.
-Since the story of SVMs has been told in detail in our class, here we just simply summarize our idea as follows: 
-Firstly, we divide 100,000 pieces of match data into two parts, 90,000 pieces for training, 10,000 pieces for testing. 
+Since the story of SVMs has been told in detail in our class, here we just simply summarize our idea as follows:
+Firstly, we divide 100,000 pieces of match data into two parts, 90,000 pieces for training, 10,000 pieces for testing.
 Secondly, execute like following pseudo-code.\\
 1.	iterator  i = 1 : 11  \\
 2.	SvmTrainData(i, 1:90000)\\
@@ -155,10 +155,10 @@ Secondly, execute like following pseudo-code.\\
 
 \subsection{Reveal the truly most decisive factors}
 
-We make a bar graph to conclude the accuracy of prediction results using 11 kinds 
+We make a bar graph to conclude the accuracy of prediction results using 11 kinds
 of items individually as follows.
 \begin{figure}[h]
-	\centering 
+	\centering
 	\includegraphics[width=0.8\linewidth]{Figure3.png}
 	\caption{CNN Reduces Parameters}
 	\label{fig:subfig}
@@ -169,10 +169,10 @@ As we can see, two most decisive factors are "gold\_per\_min" and "tower\_damage
 
 \section{Exploiting CNN to make a prediction on whether should we give up}
 \subsection{Convolutional Neural Networks}
-Convolutional Neural Networks is a type of feed-forward artificial neural network where the individual neurons are tiled in such a way that they respond to overlapping regions in the visual field.\cite{CNN1} A CNN is comprised of one or more convolutional layers (often with a subsampling step) and then followed by one or more fully connected layers as in a standard multilayer neural network.\cite{CNN2} For each layer of the network, 
+Convolutional Neural Networks is a type of feed-forward artificial neural network where the individual neurons are tiled in such a way that they respond to overlapping regions in the visual field.\cite{CNN1} A CNN is comprised of one or more convolutional layers (often with a subsampling step) and then followed by one or more fully connected layers as in a standard multilayer neural network.\cite{CNN2} For each layer of the network,
 The benefits of CNN is that it can dramatically reduce the amount of parameters that should be trained. As the figure shows below, if we obtain $1000 \times 1000$ pixels, with 1M hidden neurons, and for each neuron it should connect each pixel of the image, then there exists $10^{12}$ connections, which needs to train $10^{12}$ parameters. However, the spatial connection of the image is localized, so one neuron doesn't have to comprehend the total details of the image, and only need to read the local part of the image. And in upper layer we can synthesis different parts so that we get the global information. By this we can dramatically reduce the amount of connections. Suppose one nueron need only to connect with $10 \times 10$ pixels, the total amount of connection is $10^8$.
 \begin{figure}[h]
-	\centering 
+	\centering
 	\includegraphics[width=0.8\linewidth]{Figure2.jpg}
 	\caption{CNN Reduces Parameters}
 	\label{fig:subfig}
@@ -181,6 +181,15 @@ The benefits of CNN is that it can dramatically reduce the amount of parameters 
 In fact, we can apply same parameters for every neuron, so the parameters we need to train draws down to $10 \times 10$.
 
 \subsection{Network Design}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{NetArchitecture.png}
+	\caption{the overall architecture of our CNN}
+	\label{fig:subfig}
+\end{figure}
+The architecture of our network is summarized in Figure 4. It contains four learned layers ¡ªthere convolutional and one fully-connected.Each of these learned layer owns a filter bank of size s1*s2*s3*s4,where s1 is the number of this layer's input feature maps,s4 is the number of it's output feature maps,s2*s3 is the filter size.
+We adopt the ReLU.\cite{CNN3} as the activation function, which can makes convergence much faster while still presents good quality.\cite{CNN4} and the easy access to an abundance of data for training larger models.
+Our network learn a direct map from the game input feature map to it's label.The training is implemented using the MatConvNet package.\cite{CNN5} This toolbox borrows its convolution algorithms from Caffe. It may be somewhat slower than Caffe, but it is flexible to design a new CNN architecture.
 
 
 \subsection{Train the Network}
@@ -196,18 +205,18 @@ We will train the parameter $\theta$ in order to minimize the cost function belo
  \centering
  J(\theta) = -\frac{1}{m}[\sum_{i=1}^{m}y^{(i)}logh_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]
  \end{equation*}
- 
+
 
 \subsection{Prediction Evaluation}
 We performed the experiment using Matlab, and reached an accuracy of 98.33\% prediction accuracy rate.
 Figure 4(a) shows the change of loss function $J(\theta)$ during the training process. Figure 4(b) shows the error prediction rate of the testing set. We perform the testing process once after the network updates its parameters by randomly choose 500 matches from the testing set.
 \begin{figure}[h]
-	\centering 
-	\subfigure[loss function]{ 
-		\label{fig:subfig:a} 
-		\includegraphics[width=0.4\linewidth]{cnn_lossfunction.jpg}} 
+	\centering
+	\subfigure[loss function]{
+		\label{fig:subfig:a}
+		\includegraphics[width=0.4\linewidth]{cnn_lossfunction.jpg}}
 	\subfigure[test error rate]{
-		\label{fig:subfig:b} 
+		\label{fig:subfig:b}
 		\includegraphics[width=0.4\linewidth]{cnn_test_error_rate.jpg}}
 	\caption{The results of CNN}
 	\label{fig:subfig}
@@ -239,8 +248,23 @@ P.Bahl, V.N. Padmanabhan,
 \bibitem[4]{CNN2}
 ``$www.ufldl.stanford.edu/tutorial/supervised/ConvolutionalNeuralNetwork/$''
 \textit{Stanford}
+
+
+\bibitem[5]{CNN3}
+Nair.V,Hinton,G.E,
+``Rectified linear units improve restricted Boltzmann machines.''
+\textit{ICML},pp. 807-814, 2010.
+
+\bibitem[6]{CNN4}
+Krizhevsky.A, Sutskever.I, Hinton,
+``ImageNet classification with deep convolutional neural networks.''
+\textit{NIPS},pp. 1097-1105, 2012.
+
+\bibitem[7]{CNN5}
+``$https://github.com/vlfeat/matconvnet/$''
+\textit{Github}
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------
 
-\end{document}
+\end{document} 
